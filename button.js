@@ -8,6 +8,14 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min)) + min
+}
+
+
 class Button {
     constructor(x1, y1, width, height) {
         this.x1 = x1
@@ -127,23 +135,21 @@ class TextButton extends Button {
         this.focusColor = button_focus_colors[index]
         this.isFocus = false
 
-        // this.draw()
         document.fonts.ready.then(this.draw.bind(this))
     }
 
     draw() {
         c.beginPath()
-        c.roundRect(this.x1, this.y1, this.width, this.height, 10);
+        c.roundRect(this.x1, this.y1, this.width, this.height, 10)
         c.fillStyle = this.isFocus ? this.focusColor : this.bgColor 
-        c.fill();
+        c.fill()
 
-        c.font = '60px Nunito';
-        c.fillStyle = 'black';
-        const textX = this.x1 + (this.width - c.measureText(this.text).width) / 2;
-        const textY = this.y1 + this.height / 2 + 22;
+        c.font = '60px Nunito'
+        c.fillStyle = 'black'
+        const textX = this.x1 + (this.width - c.measureText(this.text).width) / 2
+        const textY = this.y1 + this.height / 2 + 22
         c.fillText(this.text, textX, textY)
 
-        // c.beginPath()
         c.lineWidth = 5
         const rectX = this.x1+c.lineWidth/2
         const rectY = this.y1+c.lineWidth/2
@@ -167,22 +173,25 @@ class TextButton extends Button {
 }
 
 
-class ResetButton extends Button {
-    constructor(x1, y1, diameter, imgSrc) {
+class FunctionButton extends Button {
+    constructor(x1, y1, diameter, imgSrc, isHide = false) {
         const shrink = diameter * 0.15
         super(x1 + shrink, y1 + shrink, diameter - shrink*2, diameter - shrink*2)
         this.radius = diameter / 2
         this.centerX = x1 + this.radius
         this.centerY = y1 + this.radius
 
+        this.isHide = isHide
         this.img = new Image()
         this.img.src = imgSrc
         this.img.addEventListener('load', () => this.draw())
     }
 
     draw() {
+        if (this.isHide)
+            return
         c.beginPath()
-        c.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
+        c.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI)
         c.fillStyle = `rgba(255, 100, 100, 1)`
         c.fill()
         c.drawImage(this.img, this.x1, this.y1, this.width, this.height)
@@ -191,11 +200,43 @@ class ResetButton extends Button {
         c.stroke()
     }
 
+    show() {
+        this.isHide = false
+        this.draw()
+    }
+
+    hide() {
+        this.isHide = true
+        this.draw()
+    }
+
+    inBound(mouseX, mouseY) {
+        return !this.isHide && super.inBound(mouseX, mouseY)
+    }
+}
+
+
+class ResetButton extends FunctionButton {
     onClick() {
         window.localStorage.clear()
         courses.forEach(b => {
-            b.isPicked = null            
+            b.isPicked = -1      
             b.draw()
+        })
+    }
+}
+
+
+class RandomButton extends FunctionButton {
+    onClick() {
+        var counter = courses.filter(b => b.isPicked === -1).length
+        counter = getRandomInt(0, counter)
+        courses.forEach(b => {
+            if (b.isPicked === -1) {
+                if (counter == 0)
+                    b.onClick()
+                counter -= 1
+            }
         })
     }
 }

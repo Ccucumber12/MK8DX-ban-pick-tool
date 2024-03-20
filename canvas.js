@@ -1,5 +1,5 @@
-let canvas = document.querySelector('canvas');
-let c = canvas.getContext('2d');
+let canvas = document.querySelector('canvas')
+let c = canvas.getContext('2d')
 
 function canvasResize() {
     // canvas.width = Math.min(window.innerWidth, window.innerHeight * 16 / 9)
@@ -35,11 +35,11 @@ const imgHeight = imgWidth * 277 / 404 // ratio of image
 
 
 // Get URL parameter
-const urlParams = new URLSearchParams(window.location.search);
-button_texts[1] = urlParams.get('p1') || button_texts[1];
-button_texts[2] = urlParams.get('p2') || button_texts[2];
-button_texts[3] = urlParams.get('p3') || button_texts[3];
-button_texts[4] = urlParams.get('p4') || button_texts[4];
+const urlParams = new URLSearchParams(window.location.search)
+button_texts[1] = urlParams.get('p1') || button_texts[1]
+button_texts[2] = urlParams.get('p2') || button_texts[2]
+button_texts[3] = urlParams.get('p3') || button_texts[3]
+button_texts[4] = urlParams.get('p4') || button_texts[4]
 
 
 // Course Buttons
@@ -58,12 +58,12 @@ const bottomRectY = canvas.height - bottomHeight
 // Draw bottom Rect
 c.fillStyle = '#d6d6d6'
 
-const grd = c.createLinearGradient(0, bottomRectY, 0, canvas.height);
-grd.addColorStop(0, '#b8b8b8');
-grd.addColorStop(1, '#d6d6d6');
+const grd = c.createLinearGradient(0, bottomRectY, 0, canvas.height)
+grd.addColorStop(0, '#b8b8b8')
+grd.addColorStop(1, '#d6d6d6')
 
 // Fill with gradient
-c.fillStyle = grd;
+c.fillStyle = grd
 c.fillRect(0, bottomRectY, canvas.width, canvas.height)
 
 // Draw bottom line
@@ -88,7 +88,7 @@ for (let i = 0; i < 5; i++) {
 
 // Reset Button
 resetButton = new ResetButton(buttonStartX * 0.35, buttonY, buttonHeight, "./images/reset.png")
-
+randomButton = new RandomButton(buttonStartX * 0.35, buttonY, buttonHeight, "./images/random.png", true)
 
 canvas.addEventListener('click', (event) => {
     let m = oMousePosScaleCSS(canvas, event)
@@ -97,15 +97,29 @@ canvas.addEventListener('click', (event) => {
         if (b.inBound(m.x, m.y) && b.onClick) b.onClick()
     })
 
+    var isFocused = false
     buttons.forEach(b => {
         if (b.inBound(m.x, m.y) && b.onClick) {
             b.onClick()
+            isFocused = true
         } else {
             b.releaseFocus()
         }
     })
-
+    if (randomButton.inBound(m.x, m.y) && randomButton.onClick) {
+        randomButton.onClick()
+    }
     if (resetButton.inBound(m.x, m.y) && resetButton.onClick) {
         resetButton.onClick()
+    }
+
+    if (!isFocused)
+        current_focus = -1
+    if (isFocused) {
+        resetButton.hide()
+        randomButton.show()
+    } else {
+        resetButton.show()
+        randomButton.hide()
     }
 })
