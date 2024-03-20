@@ -20,17 +20,27 @@ function oMousePosScaleCSS(canvas, event) {
     }
 }
 
+
+// Constants
 let current_focus = -1
-const button_texts = ["BAN", "Player1", "Player2", "Player3", "Player4"]
+var button_texts = ["BAN", "Player1", "Player2", "Player3", "Player4"]
 const button_idle_colors = ["#E0E0E0", "#FFCCCC", "#CCFFCC", "#CCE5FF", "#E5CCFF"]
 const button_focus_colors = ["#808080", "#FF6666", "#00D000", "#66B2FF", "#B266FF"]
 
 const n_row = 6
 const n_col = 8
 
+const imgWidth = canvas.width / n_col
+const imgHeight = imgWidth * 277 / 404 // ratio of image
 
-var imgWidth = canvas.width / n_col
-var imgHeight = imgWidth * 277 / 404 // ratio of image
+
+// Get URL parameter
+const urlParams = new URLSearchParams(window.location.search);
+button_texts[1] = urlParams.get('p1') || button_texts[1];
+button_texts[2] = urlParams.get('p2') || button_texts[2];
+button_texts[3] = urlParams.get('p3') || button_texts[3];
+button_texts[4] = urlParams.get('p4') || button_texts[4];
+
 
 // Course Buttons
 let courses = []
@@ -66,14 +76,18 @@ c.stroke()
 
 let buttons = []
 const buttonHeight = bottomHeight * 0.7
-const buttonWidth = Math.min(500, canvas.width / 6)
-const gap = (canvas.width - buttonWidth * 5) / 6
+const buttonWidth = Math.min(450, canvas.width / 7)
+const buttonStartX = buttonWidth * 1.2
+const gap = (canvas.width - buttonStartX - buttonWidth * 5) / 6
 const buttonY = bottomRectY + (bottomHeight - buttonHeight) / 2
 
 for (let i = 0; i < 5; i++) {
-    const buttonX = gap*(i+1) + buttonWidth*i
+    const buttonX = buttonStartX + gap*i + buttonWidth*i
     buttons.push(new TextButton(buttonX, buttonY, buttonWidth, buttonHeight, i))
 }
+
+// Reset Button
+resetButton = new ResetButton(buttonStartX * 0.35, buttonY, buttonHeight, "./images/reset.png")
 
 
 canvas.addEventListener('click', (event) => {
@@ -90,4 +104,8 @@ canvas.addEventListener('click', (event) => {
             b.releaseFocus()
         }
     })
+
+    if (resetButton.inBound(m.x, m.y) && resetButton.onClick) {
+        resetButton.onClick()
+    }
 })

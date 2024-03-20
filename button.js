@@ -27,6 +27,7 @@ class Button {
     }
 }
 
+
 class CourseButton extends Button {
     constructor(x1, y1, width, height, imgSrc) {
         super(x1, y1, width, height)
@@ -35,8 +36,30 @@ class CourseButton extends Button {
         this.color_img.src = imgSrc
         this.gray_img.src = imgSrc.replace('.png', '-grayscale.png')
 
-        this.isPicked = -1
-        this.color_img.addEventListener('load', () => this.draw())
+        this._isPicked = null
+        this.load_counter = 0
+        this.color_img.addEventListener('load', () => this.initDraw())
+        this.gray_img.addEventListener('load', () => this.initDraw())
+    }
+
+    get isPicked() {
+        if (this._isPicked === null) {
+            this._isPicked = parseInt(window.localStorage.getItem(this.color_img.src))
+            if (isNaN(this._isPicked))
+                this._isPicked = -1
+        }
+        return this._isPicked
+    }
+
+    set isPicked(value) {
+        window.localStorage.setItem(this.color_img.src, this._isPicked = value)
+    }
+
+    initDraw() {
+        this.load_counter += 1
+        if (this.load_counter == 2) {
+            this.draw()
+        }
     }
 
     draw() {
@@ -103,7 +126,9 @@ class TextButton extends Button {
         this.bgColor = button_idle_colors[index]
         this.focusColor = button_focus_colors[index]
         this.isFocus = false
-        this.draw()
+
+        // this.draw()
+        document.fonts.ready.then(this.draw.bind(this))
     }
 
     draw() {
@@ -119,7 +144,7 @@ class TextButton extends Button {
         c.fillText(this.text, textX, textY)
 
         // c.beginPath()
-        c.lineWidth = 4
+        c.lineWidth = 5
         const rectX = this.x1+c.lineWidth/2
         const rectY = this.y1+c.lineWidth/2
         const rectW = this.width-c.lineWidth
@@ -138,5 +163,39 @@ class TextButton extends Button {
     releaseFocus() {
         this.isFocus = false
         this.draw()
+    }
+}
+
+
+class ResetButton extends Button {
+    constructor(x1, y1, diameter, imgSrc) {
+        const shrink = diameter * 0.15
+        super(x1 + shrink, y1 + shrink, diameter - shrink*2, diameter - shrink*2)
+        this.radius = diameter / 2
+        this.centerX = x1 + this.radius
+        this.centerY = y1 + this.radius
+
+        this.img = new Image()
+        this.img.src = imgSrc
+        this.img.addEventListener('load', () => this.draw())
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
+        c.fillStyle = `rgba(255, 100, 100, 1)`
+        c.fill()
+        c.drawImage(this.img, this.x1, this.y1, this.width, this.height)
+        c.lineWidth = 10
+        c.strokeStyle = "#8cc8ff"
+        c.stroke()
+    }
+
+    onClick() {
+        window.localStorage.clear()
+        courses.forEach(b => {
+            b.isPicked = null            
+            b.draw()
+        })
     }
 }
