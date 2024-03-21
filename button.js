@@ -218,11 +218,13 @@ class FunctionButton extends Button {
 
 class ResetButton extends FunctionButton {
     onClick() {
-        window.localStorage.clear()
-        courses.forEach(b => {
-            b.isPicked = -1      
-            b.draw()
-        })
+		if (window.confirm("Reset all?")) {
+			window.localStorage.clear()
+			courses.forEach(b => {
+				b.isPicked = -1      
+				b.draw()
+			})
+		}
     }
 }
 
