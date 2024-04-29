@@ -52,7 +52,7 @@ for (let i = 0; i<n_row; i++) {
 
 
 // Select Buttons
-const bottomHeight = (canvas.height - imgHeight * n_row) * 0.9
+const bottomHeight = (canvas.height - imgHeight * n_row) * 0.99
 const bottomRectY = canvas.height - bottomHeight
 
 // Draw bottom Rect
@@ -87,8 +87,10 @@ for (let i = 0; i < 5; i++) {
 }
 
 // Reset Button
-resetButton = new ResetButton(buttonStartX * 0.35, buttonY, buttonHeight, "./images/reset.png")
-randomButton = new RandomButton(buttonStartX * 0.35, buttonY, buttonHeight, "./images/random.png", true)
+functionButtonDiameter = bottomHeight * 0.9
+functionButtonY = bottomRectY + (bottomHeight - functionButtonDiameter) / 2
+resetButton = new ResetButton(buttonStartX * 0.35, functionButtonY, functionButtonDiameter, "./images/reset.png")
+randomButton = new RandomButton(buttonStartX * 0.35, functionButtonY, functionButtonDiameter, "./images/random.png", true)
 
 canvas.addEventListener('click', (event) => {
     let m = oMousePosScaleCSS(canvas, event)
